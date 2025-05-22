@@ -85,20 +85,20 @@ function updateAuthUI() {
         authKeyBtn.style.padding = '0';
         authKeyBtn.style.overflow = 'hidden';
         
-        const headContainer = document.createElement('div');
-        headContainer.style.position = 'relative';
-        headContainer.style.width = '25px';
-        headContainer.style.height = '25px';
-        headContainer.style.display = 'inline-block';
-        headContainer.style.verticalAlign = 'middle';
+        const headContainer = document.createElement('div');        
+        headContainer.style.position = 'relative';        
+        headContainer.style.width = '45px';        
+        headContainer.style.height = '45px';        
+        headContainer.style.display = 'inline-block';        
+        headContainer.style.verticalAlign = 'middle';                
         
-        const head = document.createElement('img');
-        head.src = `https://skin.vimeworld.com/head/${userData.username}.png`;
-        head.className = 'mini-head';
-        head.alt = '';
-        head.style.width = '100%';
-        head.style.height = '100%';
-        head.style.imageRendering = 'pixelated';
+        const head = document.createElement('img');        
+        head.src = `https://skin.vimeworld.com/head/${userData.username}.png`;        
+        head.className = 'mini-head';        
+        head.alt = '';        
+        head.style.width = '100%';        
+        head.style.height = '100%';        
+        head.style.imageRendering = 'pixelated';        
         headContainer.appendChild(head);
 
         const skinFullUrl = `https://skin.vimeworld.com/raw/skin/${userData.username}.png`;
