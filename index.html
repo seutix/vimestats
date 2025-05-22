@@ -283,7 +283,23 @@
         }
         .mini-head-overlay {
             position: absolute;
-            top: 0;
+            top: 0px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            transform: scale(1.1);
+            transform-origin: center center;
+            opacity: 1;
+            pointer-events: none;
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+        .moderator-head-overlay {
+            position: absolute;
+            top: 2px;
             left: 0;
             width: 100%;
             height: 100%;
@@ -589,6 +605,24 @@
                 font-size: 1rem;
             }
         }
+
+        @keyframes blink {
+            0% { opacity: 1; box-shadow: 0 0 8px #2ecc71; }
+            50% { opacity: 0.4; box-shadow: 0 0 16px #2ecc71; }
+            100% { opacity: 1; box-shadow: 0 0 8px #2ecc71; }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 3px;
+            margin-left: 8px;
+            vertical-align: middle;
+            box-shadow: 0 0 8px #2ecc71;
+            animation: blink 2s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
@@ -619,7 +653,7 @@
         <div style="color:#3498db;font-family:'VimeArtBold',sans-serif;font-size:1rem;text-align:center;width:100%;">В разработке</div>
     </div>
     <div class="moderators-block">
-        <div class="block-title">Модеры</div>
+        <div class="block-title">Модеры <span class="status-indicator"></span></div>
         <hr>
         <div class="block-content" id="moderatorsOnline">В разработке</div>
     </div>
@@ -751,7 +785,7 @@
                                     const overlayImg = document.createElement('img');
                                     overlayImg.src = canvas.toDataURL();
                                     overlayImg.alt = `${moderator.username} head overlay`;
-                                    overlayImg.className = 'mini-head-overlay';
+                                    overlayImg.className = 'moderator-head-overlay';
                                     headContainer.appendChild(overlayImg);
                                 } catch (error) {
                                     console.error('Ошибка при создании оверлея головы:', error);
@@ -785,7 +819,7 @@
                                 }
                             }
                             
-                            // Ранг модератора с фоном, привязанным к тексту
+                            // Ранг модератора с фоном
                             const moderatorRank = document.createElement('span');
                             moderatorRank.textContent = getRankName(moderator.rank);
                             moderatorRank.style.fontSize = '0.7rem';
@@ -795,6 +829,7 @@
                             moderatorRank.style.display = 'inline-block';
                             moderatorRank.style.color = '#fff';
                             moderatorRank.style.width = 'fit-content'; // Привязка фона к тексту
+                            moderatorRank.style.whiteSpace = 'nowrap'; // Предотвращаем перенос текста
                             
                             // Применяем цвет фона на основе ранга
                             const rankColors = getRankColors(moderator.rank);
@@ -1048,42 +1083,42 @@
                 skinFullImg.crossOrigin = "Anonymous";
                 skinFullImg.src = skinFullUrl;
                 
-                skinFullImg.onload = function() {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        if (!ctx) return;
-                        
-                        // Определяем размер скина и рассчитываем масштабирование
-                        const skinResolution = skinFullImg.width;
-                        const scale = skinResolution / 64;
-                        
-                        // Координаты и размер оверлея головы на стандартном скине (64x64)
-                        const baseOverlayX = 40;
-                        const baseOverlayY = 8;
-                        const baseOverlaySize = 8;
-                        
-                        // Масштабируем координаты и размер под текущее разрешение скина
-                        const scaledOverlayX = baseOverlayX * scale;
-                        const scaledOverlayY = baseOverlayY * scale;
-                        const scaledOverlaySize = baseOverlaySize * scale;
-                        
-                        canvas.width = scaledOverlaySize;
-                        canvas.height = scaledOverlaySize;
-                        
-                        // Вырезаем оверлей головы из масштабированного скина
-                        ctx.drawImage(skinFullImg, scaledOverlayX, scaledOverlayY, scaledOverlaySize, scaledOverlaySize, 0, 0, scaledOverlaySize, scaledOverlaySize);
-                        
-                        // Создаем изображение из canvas и добавляем на страницу
-                        const overlayImg = document.createElement('img');
-                        overlayImg.src = canvas.toDataURL();
-                        overlayImg.alt = `${nick} head overlay`;
-                        overlayImg.className = 'mini-head-overlay';
-                        headContainer.appendChild(overlayImg);
-                    } catch (error) {
-                        console.error('Ошибка при создании оверлея головы:', error);
-                    }
-                };
+                                        skinFullImg.onload = function() {
+                            try {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                if (!ctx) return;
+                                
+                                // Определяем размер скина и рассчитываем масштабирование
+                                const skinResolution = skinFullImg.width;
+                                const scale = skinResolution / 64;
+                                
+                                // Координаты и размер оверлея головы на стандартном скине (64x64)
+                                const baseOverlayX = 40;
+                                const baseOverlayY = 8;
+                                const baseOverlaySize = 8;
+                                
+                                // Масштабируем координаты и размер под текущее разрешение скина
+                                const scaledOverlayX = baseOverlayX * scale;
+                                const scaledOverlayY = baseOverlayY * scale;
+                                const scaledOverlaySize = baseOverlaySize * scale;
+                                
+                                canvas.width = scaledOverlaySize;
+                                canvas.height = scaledOverlaySize;
+                                
+                                // Вырезаем оверлей головы из масштабированного скина
+                                ctx.drawImage(skinFullImg, scaledOverlayX, scaledOverlayY, scaledOverlaySize, scaledOverlaySize, 0, 0, scaledOverlaySize, scaledOverlaySize);
+                                
+                                // Создаем изображение из canvas и добавляем на страницу
+                                const overlayImg = document.createElement('img');
+                                overlayImg.src = canvas.toDataURL();
+                                overlayImg.alt = `${nick} head overlay`;
+                                overlayImg.className = 'mini-head-overlay';
+                                headContainer.appendChild(overlayImg);
+                            } catch (error) {
+                                console.error('Ошибка при создании оверлея головы:', error);
+                            }
+                        };
                 
                 skinFullImg.onerror = function() {
                     console.error('Ошибка при загрузке скина:', nick);
@@ -1605,6 +1640,5 @@
             // Остальной код обработки формы...
         });
     </script>
-    <script src="auth.js"></script>
 </body>
 </html>
