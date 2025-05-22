@@ -685,6 +685,11 @@
                         moderatorsList.style.padding = '0';
                         moderatorsList.style.margin = '0';
 
+                        // Сортировка модераторов по рангам
+                        staffData.sort((a, b) => {
+                            return getRankPriority(b.rank) - getRankPriority(a.rank);
+                        });
+
                         staffData.forEach(moderator => {
                             const listItem = document.createElement('li');
                             listItem.style.display = 'flex';
@@ -733,23 +738,29 @@
                                 }
                             }
                             
-                            // Ранг модератора
+                            // Ранг модератора с фоном
                             const moderatorRank = document.createElement('span');
                             moderatorRank.textContent = getRankName(moderator.rank);
-                            moderatorRank.style.fontSize = '0.75rem';
-                            moderatorRank.style.color = '#95a5a6';
+                            moderatorRank.style.fontSize = '0.7rem';
+                            moderatorRank.style.padding = '2px 6px';
+                            moderatorRank.style.borderRadius = '4px';
+                            moderatorRank.style.margin = '2px 0';
+                            moderatorRank.style.display = 'inline-block';
+                            moderatorRank.style.color = '#fff';
+                            
+                            // Применяем цвет фона на основе ранга
+                            const rankColors = getRankColors(moderator.rank);
+                            if (rankColors.length > 1) {
+                                moderatorRank.style.background = `linear-gradient(to right, ${rankColors.map(color => `#${color}`).join(', ')})`;
+                            } else {
+                                moderatorRank.style.background = `#${rankColors[0]}`;
+                            }
                             
                             infoContainer.appendChild(moderatorName);
                             infoContainer.appendChild(moderatorRank);
                             
-                            // Индикатор онлайн
-                            const statusDot = document.createElement('div');
-                            statusDot.className = 'online-status online';
-                            statusDot.style.marginLeft = 'auto';
-                            
                             listItem.appendChild(headContainer);
                             listItem.appendChild(infoContainer);
-                            listItem.appendChild(statusDot);
                             
                             // Добавляем обработчик клика для перехода на профиль
                             listItem.addEventListener('click', () => {
@@ -770,19 +781,83 @@
                 });
         }
         
+        // Получение приоритета ранга для сортировки
+        function getRankPriority(rankCode) {
+            const rankPriorities = {
+                "ADMIN": 100,
+                "CHIEF": 90,
+                "WARDEN": 80,
+                "MODER": 70,
+                "HELPER": 60,
+                "ORGANIZER": 55,
+                "DEV": 50,
+                "MAPLEAD": 45,
+                "SRBUILDER": 40,
+                "BUILDER": 35,
+                "JRBUILDER": 30,
+                "YOUTUBE": 25,
+                "ETERNAL": 20,
+                "THANE": 18,
+                "ELITE": 16,
+                "DIVINE": 14,
+                "IMMORTAL": 12,
+                "HOLY": 10,
+                "PREMIUM": 8,
+                "VIP": 6,
+                "VIME": 4,
+                "PLAYER": 2
+            };
+            return rankPriorities[rankCode] || 0;
+        }
+        
+        // Получение цветов ранга
+        function getRankColors(rankCode) {
+            const rankColors = {
+                "ADMIN": ["ff2030", "d40048", "c1006b"],
+                "CHIEF": ["ff5e43", "db2100"],
+                "WARDEN": ["3c36de"],
+                "MODER": ["4e62eb"],
+                "HELPER": ["76a6ff"],
+                "ORGANIZER": ["0d83ae", "00c0eb"],
+                "DEV": ["d61753"],
+                "YOUTUBE": ["bf2dff", "f33fd7"],
+                "MAPLEAD": ["55961a", "3f6e13"],
+                "SRBUILDER": ["57c22d", "55961a"],
+                "BUILDER": ["67ff54", "57c22d"],
+                "JRBUILDER": ["bdecb6", "67ff54"],
+                "VIME": ["2599d4", "1d7cab"],
+                "ETERNAL": ["2688ed", "8b00d7", "ff4161"],
+                "ELITE": ["ffa51e", "ff5619", "ff314a"],
+                "THANE": ["30ff87", "1cffe4", "3594ff"],
+                "DIVINE": ["b451ff", "84b5ff"],
+                "IMMORTAL": ["ff70d1", "ff5d6d"],
+                "HOLY": ["fff8a9", "ffa317"],
+                "PREMIUM": ["3decff"],
+                "VIP": ["3dff80"],
+                "PLAYER": ["cccccc"]
+            };
+            return rankColors[rankCode] || ["cccccc"];
+        }
+        
         // Получение локализованного имени ранга
         function getRankName(rankCode) {
+            // Используем сокращенные названия из ranksData
+            if (ranksData[rankCode]) {
+                return ranksData[rankCode].name;
+            }
+            
+            // Запасной вариант для рангов, которых нет в ranksData
             const rankNames = {
-                "ADMIN": "Главный Администратор",
-                "CHIEF": "Администратор",
-                "WARDEN": "Проверенный Модератор",
+                "ADMIN": "Гл. Админ",
+                "CHIEF": "Админ",
+                "WARDEN": "Пр. Модератор",
                 "MODER": "Модератор",
                 "HELPER": "Хелпер",
                 "BUILDER": "Билдер",
-                "SRBUILDER": "Старший Билдер",
-                "JRBUILDER": "Младший Билдер",
-                "MAPLEAD": "Главный Билдер",
-                "YOUTUBE": "YouTube",
+                "SRBUILDER": "Ст. Билдер",
+                "JRBUILDER": "Мл. Билдер",
+                "MAPLEAD": "Гл. Билдер",
+                "YOUTUBE": "Media",
                 "DEV": "Разработчик",
                 "ORGANIZER": "Организатор",
                 "DIVINE": "Divine",
@@ -798,8 +873,8 @@
             };
             return rankNames[rankCode] || rankCode;
         }
-
-        // Данные о рангах
+        
+        // Данные о рангах для обратной совместимости
         const ranksData = {
             "PLAYER": { name: "Игрок", colors: [] },
             "VIP": { name: "VIP", colors: ["3dff80"] },
@@ -1327,7 +1402,6 @@
             });
         }
 
-
         // Обновляем статусы при открытии списка
         searchInput.addEventListener('focus', () => {
             if (recentNicksList.children.length > 0) {
@@ -1483,6 +1557,5 @@
             // Остальной код обработки формы...
         });
     </script>
-    <script src="auth.js"></script>
 </body>
 </html>
