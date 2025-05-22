@@ -619,9 +619,9 @@
         <div style="color:#3498db;font-family:'VimeArtBold',sans-serif;font-size:1rem;text-align:center;width:100%;">В разработке</div>
     </div>
     <div class="moderators-block">
-        <div class="block-title">Модераторы в сети</div>
+        <div class="block-title">Модеры</div>
         <hr>
-        <div class="block-content">В разработке</div>
+        <div class="block-content" id="moderatorsOnline">В разработке</div>
     </div>
     <div class="search-container">
         <div class="logo">
@@ -664,6 +664,140 @@
         const recentGuilds = document.getElementById('recentGuilds');
         const recentNicksList = recentNicks.querySelector('.recent-nicks-list');
         const recentGuildsList = recentGuilds.querySelector('.recent-nicks-list');
+
+        // Загрузка модераторов онлайн
+        function loadModeratorsOnline() {
+            const moderatorsBlock = document.getElementById('moderatorsOnline');
+            moderatorsBlock.innerHTML = 'Загрузка...';
+            
+            fetch('https://api.vimeworld.com/online/staff')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(staffData => {
+                    if (staffData && staffData.length > 0) {
+                        moderatorsBlock.innerHTML = '';
+                        const moderatorsList = document.createElement('ul');
+                        moderatorsList.style.listStyle = 'none';
+                        moderatorsList.style.padding = '0';
+                        moderatorsList.style.margin = '0';
+
+                        staffData.forEach(moderator => {
+                            const listItem = document.createElement('li');
+                            listItem.style.display = 'flex';
+                            listItem.style.alignItems = 'center';
+                            listItem.style.padding = '8px 0';
+                            listItem.style.borderBottom = '1px solid #e0e0e0';
+                            listItem.style.cursor = 'pointer';
+                            
+                            // Контейнер для головы
+                            const headContainer = document.createElement('div');
+                            headContainer.style.position = 'relative';
+                            headContainer.style.width = '25px';
+                            headContainer.style.height = '25px';
+                            headContainer.style.marginRight = '8px';
+                            
+                            // Базовая голова
+                            const head = document.createElement('img');
+                            head.src = `https://skin.vimeworld.com/head/${moderator.username}.png`;
+                            head.className = 'mini-head';
+                            head.alt = '';
+                            head.onerror = function() {
+                                head.src = 'https://skin.vimeworld.com/head/Steve.png';
+                            };
+                            headContainer.appendChild(head);
+                            
+                            // Контейнер информации
+                            const infoContainer = document.createElement('div');
+                            infoContainer.style.display = 'flex';
+                            infoContainer.style.flexDirection = 'column';
+                            
+                            // Имя модератора
+                            const moderatorName = document.createElement('span');
+                            moderatorName.textContent = moderator.username;
+                            moderatorName.style.fontFamily = "'VimeArtBold', sans-serif";
+                            moderatorName.style.fontSize = '0.9rem';
+                            
+                            // Установка цвета на основе рангов
+                            if (moderator.customColors && moderator.customColors.length > 0) {
+                                if (moderator.customColors.length === 1) {
+                                    moderatorName.style.color = `#${moderator.customColors[0]}`;
+                                } else {
+                                    const gradient = `linear-gradient(to right, ${moderator.customColors.map(color => `#${color}`).join(', ')})`;
+                                    moderatorName.style.background = gradient;
+                                    moderatorName.style.webkitBackgroundClip = 'text';
+                                    moderatorName.style.webkitTextFillColor = 'transparent';
+                                }
+                            }
+                            
+                            // Ранг модератора
+                            const moderatorRank = document.createElement('span');
+                            moderatorRank.textContent = getRankName(moderator.rank);
+                            moderatorRank.style.fontSize = '0.75rem';
+                            moderatorRank.style.color = '#95a5a6';
+                            
+                            infoContainer.appendChild(moderatorName);
+                            infoContainer.appendChild(moderatorRank);
+                            
+                            // Индикатор онлайн
+                            const statusDot = document.createElement('div');
+                            statusDot.className = 'online-status online';
+                            statusDot.style.marginLeft = 'auto';
+                            
+                            listItem.appendChild(headContainer);
+                            listItem.appendChild(infoContainer);
+                            listItem.appendChild(statusDot);
+                            
+                            // Добавляем обработчик клика для перехода на профиль
+                            listItem.addEventListener('click', () => {
+                                window.location.href = `player.html?username=${encodeURIComponent(moderator.username)}`;
+                            });
+                            
+                            moderatorsList.appendChild(listItem);
+                        });
+                        
+                        moderatorsBlock.appendChild(moderatorsList);
+                    } else {
+                        moderatorsBlock.innerHTML = 'Нет модераторов онлайн';
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке модераторов:', error);
+                    moderatorsBlock.innerHTML = 'Ошибка загрузки';
+                });
+        }
+        
+        // Получение локализованного имени ранга
+        function getRankName(rankCode) {
+            const rankNames = {
+                "ADMIN": "Главный Администратор",
+                "CHIEF": "Администратор",
+                "WARDEN": "Проверенный Модератор",
+                "MODER": "Модератор",
+                "HELPER": "Хелпер",
+                "BUILDER": "Билдер",
+                "SRBUILDER": "Старший Билдер",
+                "JRBUILDER": "Младший Билдер",
+                "MAPLEAD": "Главный Билдер",
+                "YOUTUBE": "YouTube",
+                "DEV": "Разработчик",
+                "ORGANIZER": "Организатор",
+                "DIVINE": "Divine",
+                "IMMORTAL": "Immortal",
+                "HOLY": "Holy",
+                "PREMIUM": "Premium",
+                "VIP": "VIP",
+                "PLAYER": "Игрок",
+                "THANE": "Thane",
+                "ELITE": "Elite",
+                "VIME": "Vime",
+                "ETERNAL": "Eternal"
+            };
+            return rankNames[rankCode] || rankCode;
+        }
 
         // Данные о рангах
         const ranksData = {
@@ -1149,6 +1283,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadRecentNicks();
             loadRecentGuilds();
+            loadModeratorsOnline();
 
             if (JSON.parse(localStorage.getItem('recentNicks') || '[]').length > 0) {
                 recentNicks.style.visibility = 'visible';
