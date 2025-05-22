@@ -81,25 +81,31 @@ function updateAuthUI() {
         const userData = authStatus.userData;
         console.log('Данные пользователя:', userData);
         
-        // Очищаем содержимое кнопки
         authKeyBtn.innerHTML = '';
         authKeyBtn.style.padding = '0';
         authKeyBtn.style.overflow = 'hidden';
         
-        // Создаем контейнер для головы
         const headContainer = document.createElement('div');
         headContainer.style.position = 'relative';
-        headContainer.style.width = '40px';
-        headContainer.style.height = '40px';
+        headContainer.style.width = '25px';
+        headContainer.style.height = '25px';
+        headContainer.style.display = 'inline-block';
+        headContainer.style.verticalAlign = 'middle';
         
-        // Добавляем базовую голову
         const head = document.createElement('img');
         head.src = `https://skin.vimeworld.com/head/${userData.username}.png`;
+        head.className = 'mini-head';
+        head.alt = '';
         head.style.width = '100%';
         head.style.height = '100%';
         head.style.imageRendering = 'pixelated';
-        head.alt = '';
         headContainer.appendChild(head);
+
+        const skinFullUrl = `https://skin.vimeworld.com/raw/skin/${userData.username}.png`;
+        const skinFullImg = new Image();
+        skinFullImg.crossOrigin = "Anonymous";
+        skinFullImg.src = skinFullUrl;
+
         
         try {
             // Добавляем оверлей головы
@@ -193,15 +199,6 @@ function updateAuthUI() {
             authMenu.style.padding = '10px 0';
             authMenu.style.zIndex = '1010';
             
-            // Добавляем никнейм пользователя
-            const userInfo = document.createElement('div');
-            userInfo.style.padding = '10px 15px';
-            userInfo.style.borderBottom = '1px solid #e6f3ff';
-            userInfo.style.marginBottom = '5px';
-            userInfo.style.fontFamily = "'VimeArtBold', sans-serif";
-            userInfo.style.color = '#3498db';
-            userInfo.textContent = userData.username;
-            authMenu.appendChild(userInfo);
             
             // Добавляем кнопку профиля
             const profileBtn = document.createElement('div');
