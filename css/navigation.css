@@ -1,0 +1,211 @@
+.navbar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-family: 'VimeArtBold', sans-serif;
+    font-size: 1.2rem;
+    color: #3498db;
+    letter-spacing: 1px;
+    padding-left: 24px;
+    z-index: 2;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(52, 152, 219, 0.2),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+.navbar-brand:hover {
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+    transform: scale(1.05);
+}
+
+.nav-link {
+    font-family: 'VimeArtBold', sans-serif;
+    color: #3498db !important;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-link:hover {
+    color: #2980b9 !important;
+    transform: translateY(-1px);
+}
+
+.nav-link svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.nav-link:hover svg {
+    transform: scale(1.1);
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #3498db;
+    color: #2c3e50;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 200px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    animation: glow 2s infinite;
+}
+
+.search-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: 'VimeArtBold', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.login-btn, .register-btn {
+    font-family: 'VimeArtBold', sans-serif;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    background: transparent;
+    border: 1px solid #3498db;
+    color: #3498db;
+}
+
+.login-btn:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateY(-2px);
+}
+
+.register-btn {
+    background: #3498db;
+    border: none;
+    color: white;
+}
+
+.register-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.recent-searches {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #3498db;
+    border-radius: 8px;
+    margin-top: 5px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.recent-searches .list-group-item {
+    padding: 10px 15px;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.recent-searches .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.recent-searches .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+@keyframes glow {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.2); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1rem;
+        padding-left: 10px;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+    }
+
+    .search-container {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .login-btn, .register-btn {
+        width: 100%;
+    }
+} 

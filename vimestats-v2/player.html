@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль игрока - VimeStats</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+        <div class="player-profile">
+            <!-- Основная информация об игроке -->
+            <div class="player-main-info">
+                <div class="player-header">
+                    <div class="player-avatar">
+                        <!-- Здесь будет аватар игрока -->
+                    </div>
+                    <div class="player-details">
+                        <h2 class="player-name">Никнейм</h2>
+                        <h2 class="player-id">id:</h2>
+                        <div class="player-rank">Ранг</div>
+                        <div class="player-guild">Гильдия</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Отступ между секциями -->
+            <div class="section-spacer"></div>
+
+            <!-- Вкладки профиля -->
+            <div class="profile-tabs-bg">
+                <div class="player-tabs">
+                    <button class="tab-button active" data-tab="stats">
+                        <i class="fas fa-chart-bar"></i> Статистика
+                    </button>
+                    <button class="tab-button" data-tab="friends">
+                        <i class="fas fa-users"></i> Друзья
+                    </button>
+                    <button class="tab-button" data-tab="skin">
+                        <i class="fas fa-user"></i> Скин
+                    </button>
+                    <button class="tab-button" data-tab="achievements">
+                        <i class="fas fa-trophy"></i> Достижения
+                    </button>
+                    <button class="tab-button" data-tab="matches">
+                        <i class="fas fa-gamepad"></i> Матчи
+                    </button>
+                </div>
+
+                <!-- Контент вкладок -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="stats">
+                        <!-- Здесь будет статистика -->
+                    </div>
+                    <div class="tab-pane" id="friends">
+                        <!-- Здесь будет список друзей -->
+                    </div>
+                    <div class="tab-pane" id="skin">
+                        <!-- Здесь будет 3D модель скина -->
+                    </div>
+                    <div class="tab-pane" id="achievements">
+                        <!-- Здесь будут достижения -->
+                    </div>
+                    <div class="tab-pane" id="matches">
+                        <!-- Здесь будет история матчей -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/player.js"></script>
+</body>
+</html>
