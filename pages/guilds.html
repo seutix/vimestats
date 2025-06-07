@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Список гильдий | VimeStats</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/responsive.css" rel="stylesheet">
+    <!-- Добавляем версию для предотвращения кэширования -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        @font-face {
+            font-family: 'VimeArtBold';
+            src: url('../assets/fonts/vimeartbold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #e6f3ff 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            font-family: 'VimeArtBold', sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 0;
+            padding: 20px;
+        }
+        .nav-tabs {
+            border: none;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            background: #fff;
+            color: #3498db;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: 'VimeArtBold', sans-serif;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.08);
+        }
+        .nav-tabs .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.15);
+        }
+        .nav-tabs .nav-link.active {
+            background: #3498db;
+            color: #fff;
+        }
+        .guild-list {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.10);
+        }
+        .guild-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        .guild-table th {
+            font-family: 'VimeArtBold', sans-serif;
+            color: #95a5a6;
+            font-size: 0.9rem;
+            padding: 12px;
+            text-align: left;
+            border: none;
+        }
+        .guild-table tr {
+            background: rgba(52, 152, 219, 0.05);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .guild-table tr:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: translateX(4px);
+        }
+        .guild-table td {
+            padding: 16px;
+            font-family: 'VimeArtBold', sans-serif;
+            color: #2c3e50;
+            border: none;
+        }
+        .guild-tag {
+            color: #3498db;
+            margin-right: 8px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-family: 'VimeArtBold', sans-serif;
+            color: #3498db;
+        }
+        .error-message {
+            text-align: center;
+            color: #e74c3c;
+            padding: 20px;
+            font-family: 'VimeArtBold', sans-serif;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            .nav-tabs .nav-link {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+            .guild-table th, .guild-table td {
+                font-size: 0.9rem;
+                padding: 12px 8px;
+            }
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .page-button {
+            background: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #3498db;
+            font-family: 'VimeArtBold', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+        }
+        .page-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+        }
+        .page-button.active {
+            background: #3498db;
+            color: #fff;
+        }
+        .page-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="position:fixed;top:0;left:0;width:100%;z-index:1000;">
+        <div class="container-fluid" style="padding-left:0;padding-right:0;position:relative;min-height:56px;display:flex;align-items:center;">
+            <a class="navbar-brand" href="../index.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.2rem;color:#3498db;letter-spacing:1px;padding-left:24px;">VimeStats</a>
+            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:24px;z-index:1;">
+                <a href="tops.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M19 5V3H5v2M19 5v2a7 7 0 0 1-14 0V5m14 0h2a2 2 0 0 1 2 2v1a7 7 0 0 1-6 6.93M5 5H3a2 2 0 0 0-2 2v1a7 7 0 0 0 6 6.93" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Топы
+                </a>
+                <a href="guilds.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 21h18M3 18h18M8 21v-3m8 3v-3m-4 0v-3m0-1V7m3 3V7m3 3V7m-12 3V7m3 3V7M12 7H4.2c-.56 0-.84 0-1.054-.109a1 1 0 0 1-.437-.437C2.6 6.24 2.6 5.96 2.6 5.4V4.2c0-.56 0-.84.109-1.054a1 1 0 0 1 .437-.437C3.36 2.6 3.64 2.6 4.2 2.6h15.6c.56 0 .84 0 1.054.109a1 1 0 0 1 .437.437c.109.214.109.494.109 1.054v1.2c0 .56 0 .84-.109 1.054a1 1 0 0 1-.437.437C20.64 7 20.36 7 19.8 7H12z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Гильдии
+                </a>
+                <a href="moders.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Персонал
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#level" type="button" role="tab">
+                    По уровню
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#coins" type="button" role="tab">
+                    По коинам
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="level" role="tabpanel">
+                <div class="guild-list">
+                    <div id="levelLoading" class="loading">Загрузка списка гильдий...</div>
+                    <div id="levelError" class="error-message" style="display: none;"></div>
+                    <div id="levelContent" style="display: none;"></div>
+                    <div id="levelPagination" class="pagination-container" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="coins" role="tabpanel">
+                <div class="guild-list">
+                    <div id="coinsLoading" class="loading">Загрузка списка гильдий...</div>
+                    <div id="coinsError" class="error-message" style="display: none;"></div>
+                    <div id="coinsContent" style="display: none;"></div>
+                    <div id="coinsPagination" class="pagination-container" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Базовый URL для API через прокси
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Кэш для хранения данных о гильдиях
+        const guildCache = new Map();
+        
+        // Функция для отображения записи лидерборда
+        function renderLeaderboardRow(guild, index) {
+            if (!guild) return '';
+            
+            const tag = guild.tag ? `<span class="guild-tag" style="color: #${guild.color || '3498db'}">[${guild.tag}]</span>` : '';
+            const name = guild.name || 'Неизвестно';
+            const leader = guild.leader ? guild.leader.username || 'Неизвестно' : 'Неизвестно';
+            
+            return `
+                <tr onclick="window.location.href='guild.html?id=${guild.id}'">
+                    <td>${index + 1}</td>
+                    <td>${tag} ${name}</td>
+                    <td>${leader}</td>
+                    <td>${guild.level || 0}</td>
+                    ${guild.levelPercentage ? `<td>${Math.round(guild.levelPercentage * 100)}%</td>` : ''}
+                    ${guild.created ? `<td>${formatDate(guild.created)}</td>` : ''}
+                    ${guild.coins ? `<td>${guild.coins.toLocaleString()}</td>` : ''}
+                </tr>
+            `;
+        }
+        
+        // Функция для форматирования даты
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        // Функция для получения данных лидерборда
+        async function loadLeaderboard(type, sort = null) {
+            try {
+                // Для гильдий используем специальный эндпоинт
+                const endpoint = type === 'guild' 
+                    ? `${API_BASE_URL}/leaderboard/get/${type}`
+                    : `${API_BASE_URL}/leaderboard/get/${type}/${sort}`;
+                
+                console.log('Загрузка лидерборда:', endpoint);
+                const response = await fetch(endpoint);
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка загрузки лидерборда: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data || !data.records) {
+                    throw new Error('Неверный формат данных лидерборда');
+                }
+
+                // Если запрошена сортировка по коинам, сортируем данные
+                if (sort === 'coins' && data.records) {
+                    data.records.sort((a, b) => (b.totalCoins || 0) - (a.totalCoins || 0));
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Ошибка загрузки лидерборда:', error);
+                return null;
+            }
+        }
+
+        // Функция для поиска гильдий
+        async function searchGuilds(query) {
+            if (!query || query.length < 2) return [];
+            try {
+                const response = await fetch(`${API_BASE_URL}/guild/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) return [];
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('Ошибка поиска гильдий:', error);
+                return [];
+            }
+        }
+
+        // Функция для получения информации о гильдии с повторными попытками
+        async function loadGuildDetails(id) {
+            // Проверяем кэш
+            if (guildCache.has(id)) {
+                return guildCache.get(id);
+            }
+
+            const maxRetries = 3;
+            let lastError;
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/guild/get/${id}`);
+                    
+                    if (response.status === 404) {
+                        console.warn(`Гильдия с ID ${id} не найдена`);
+                        return null;
+                    }
+
+                    if (response.status === 429) {
+                        // При превышении лимита запросов ждем и пробуем снова
+                        const retryAfter = response.headers.get('Retry-After');
+                        const delay = retryAfter ? parseInt(retryAfter) * 1000 : Math.min(1000 * Math.pow(2, attempt), 5000);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`Ошибка загрузки гильдии: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // Проверяем валидность данных
+                    if (!data || typeof data !== 'object') {
+                        throw new Error('Неверный формат данных гильдии');
+                    }
+                    
+                    // Сохраняем в кэш только валидные данные
+                    guildCache.set(id, data);
+                    
+                    return data;
+                } catch (error) {
+                    console.error(`Попытка ${attempt + 1}/${maxRetries} загрузки гильдии ${id} не удалась:`, error);
+                    lastError = error;
+                    
+                    if (attempt < maxRetries - 1) {
+                        // Экспоненциальная задержка перед следующей попыткой
+                        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+                    }
+                }
+            }
+
+            console.error(`Все попытки загрузки гильдии ${id} не удались:`, lastError);
+            return null;
+        }
+
+        // Функция для пакетной загрузки гильдий с повторными попытками
+        async function loadGuildsBatch(records, startIndex) {
+            const batchSize = 5;
+            const results = [];
+            
+            for (let i = 0; i < records.length; i += batchSize) {
+                const batch = records.slice(i, i + batchSize);
+                
+                try {
+                    const guildPromises = batch.map(record => 
+                        loadGuildDetails(record.id)
+                            .then(guildDetails => {
+                                if (!guildDetails) {
+                                    return {
+                                        id: record.id,
+                                        name: 'Гильдия не найдена',
+                                        tag: null,
+                                        color: null,
+                                        level: record.value || 0,
+                                        coins: record.coins || 0,
+                                        leader: null
+                                    };
+                                }
+                                return guildDetails;
+                            })
+                            .catch(error => {
+                                console.error(`Ошибка загрузки гильдии ${record.id}:`, error);
+                                return {
+                                    id: record.id,
+                                    name: 'Ошибка загрузки',
+                                    tag: null,
+                                    color: null,
+                                    level: record.value || 0,
+                                    coins: record.coins || 0,
+                                    leader: null
+                                };
+                            })
+                    );
+
+                    const batchResults = await Promise.all(guildPromises);
+                    results.push(...batchResults);
+
+                    if (i + batchSize < records.length) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                } catch (error) {
+                    console.error(`Ошибка загрузки пакета гильдий:`, error);
+                }
+            }
+            
+            return results;
+        }
+
+        // Константы для пагинации
+        const ITEMS_PER_PAGE = 25;
+        const MAX_ITEMS = 1000;
+        const MAX_PAGES = Math.ceil(MAX_ITEMS / ITEMS_PER_PAGE);
+
+        // Функция для создания пагинации
+        function createPagination(currentPage, totalPages, containerId, onPageChange) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            // Создаем кнопки пагинации
+            const createPageButton = (page, text = page) => {
+                const button = document.createElement('button');
+                button.className = `page-button ${page === currentPage ? 'active' : ''}`;
+                button.textContent = text;
+                button.onclick = () => onPageChange(page);
+                return button;
+            };
+
+            // Добавляем кнопку "Первая"
+            container.appendChild(createPageButton(1, '<<'));
+
+            // Добавляем кнопку "Предыдущая"
+            const prevButton = createPageButton(Math.max(1, currentPage - 1), '<');
+            prevButton.disabled = currentPage === 1;
+            container.appendChild(prevButton);
+
+            // Добавляем номера страниц
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                container.appendChild(createPageButton(i));
+            }
+
+            // Добавляем кнопку "Следующая"
+            const nextButton = createPageButton(Math.min(totalPages, currentPage + 1), '>');
+            nextButton.disabled = currentPage === totalPages;
+            container.appendChild(nextButton);
+
+            // Добавляем кнопку "Последняя"
+            container.appendChild(createPageButton(totalPages, '>>'));
+
+            container.style.display = 'flex';
+        }
+
+        // Функция для отображения списка по уровню
+        async function showLevelList(page = 1) {
+            const loading = document.getElementById('levelLoading');
+            const error = document.getElementById('levelError');
+            const content = document.getElementById('levelContent');
+            const pagination = document.getElementById('levelPagination');
+
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                content.style.display = 'none';
+                pagination.style.display = 'none';
+
+                const leaderboard = await loadLeaderboard('guild');
+                
+                if (!leaderboard || !leaderboard.records) {
+                    throw new Error('Не удалось загрузить топ гильдий');
+                }
+
+                // Ограничиваем количество записей
+                const limitedRecords = leaderboard.records.slice(0, MAX_ITEMS);
+                const startIndex = (page - 1) * ITEMS_PER_PAGE;
+                const endIndex = startIndex + ITEMS_PER_PAGE;
+                const currentPageRecords = limitedRecords.slice(startIndex, endIndex);
+
+                content.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px; font-size: 1.2rem; color: #3498db;">
+                        Топ гильдий по уровню (${startIndex + 1}-${Math.min(endIndex, limitedRecords.length)} из ${limitedRecords.length})
+                    </div>
+                    <table class="guild-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Гильдия</th>
+                                <th>Лидер</th>
+                                <th>Уровень</th>
+                                <th>Прогресс</th>
+                            </tr>
+                        </thead>
+                        <tbody id="levelTableBody"></tbody>
+                    </table>
+                `;
+
+                const tableBody = document.getElementById('levelTableBody');
+                
+                // Загружаем гильдии пакетами
+                const guilds = await loadGuildsBatch(currentPageRecords, startIndex);
+                
+                // Отображаем результаты
+                guilds.forEach((guildDetails, index) => {
+                    const row = document.createElement('tr');
+                    row.onclick = () => window.location.href = `guild.html?id=${guildDetails.id}`;
+                    
+                    const tag = guildDetails.tag ? 
+                        `<span class="guild-tag" style="color: #${guildDetails.color || '3498db'}">[${guildDetails.tag}]</span>` : 
+                        '';
+                    const name = guildDetails.name || 'Неизвестно';
+                    const leader = guildDetails.members && guildDetails.members.length > 0 ? 
+                        guildDetails.members.find(m => m.status === 3)?.username || 'Неизвестно' : 'Неизвестно';
+                    const level = guildDetails.level || 0;
+                    const progress = Math.round((guildDetails.levelPercentage || 0) * 100);
+                    
+                    row.innerHTML = `
+                        <td>${startIndex + index + 1}</td>
+                        <td>${tag} ${name}</td>
+                        <td>${leader}</td>
+                        <td>${level}</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: ${progress}%; background: #3498db;" 
+                                     aria-valuenow="${progress}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    ${progress}%
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+
+                // Создаем пагинацию
+                createPagination(page, MAX_PAGES, 'levelPagination', (newPage) => showLevelList(newPage));
+
+                loading.style.display = 'none';
+                error.style.display = 'none';
+                content.style.display = 'block';
+                pagination.style.display = 'flex';
+            } catch (err) {
+                console.error('Ошибка:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = 'Ошибка загрузки: ' + err.message;
+            }
+        }
+
+        // Функция для отображения списка по коинам
+        async function showCoinsList(page = 1) {
+            const loading = document.getElementById('coinsLoading');
+            const error = document.getElementById('coinsError');
+            const content = document.getElementById('coinsContent');
+            const pagination = document.getElementById('coinsPagination');
+
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                content.style.display = 'none';
+                pagination.style.display = 'none';
+
+                const leaderboard = await loadLeaderboard('guild');
+                
+                if (!leaderboard || !leaderboard.records) {
+                    throw new Error('Не удалось загрузить топ гильдий');
+                }
+
+                // Сортируем по коинам
+                const sortedRecords = [...leaderboard.records].sort((a, b) => (b.totalCoins || 0) - (a.totalCoins || 0));
+
+                // Ограничиваем количество записей
+                const limitedRecords = sortedRecords.slice(0, MAX_ITEMS);
+                const startIndex = (page - 1) * ITEMS_PER_PAGE;
+                const endIndex = startIndex + ITEMS_PER_PAGE;
+                const currentPageRecords = limitedRecords.slice(startIndex, endIndex);
+
+                content.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px; font-size: 1.2rem; color: #3498db;">
+                        Топ гильдий по коинам (${startIndex + 1}-${Math.min(endIndex, limitedRecords.length)} из ${limitedRecords.length})
+                    </div>
+                    <table class="guild-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Гильдия</th>
+                                <th>Лидер</th>
+                                <th>Коины</th>
+                                <th>Уровень</th>
+                                <th>Прогресс</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coinsTableBody"></tbody>
+                    </table>
+                `;
+
+                const tableBody = document.getElementById('coinsTableBody');
+                
+                // Загружаем гильдии пакетами
+                const guilds = await loadGuildsBatch(currentPageRecords, startIndex);
+                
+                // Отображаем результаты
+                guilds.forEach((guildDetails, index) => {
+                    const row = document.createElement('tr');
+                    row.onclick = () => window.location.href = `guild.html?id=${guildDetails.id}`;
+                    
+                    const tag = guildDetails.tag ? 
+                        `<span class="guild-tag" style="color: #${guildDetails.color || '3498db'}">[${guildDetails.tag}]</span>` : 
+                        '';
+                    const name = guildDetails.name || 'Неизвестно';
+                    const leader = guildDetails.members && guildDetails.members.length > 0 ? 
+                        guildDetails.members.find(m => m.status === 3)?.username || 'Неизвестно' : 'Неизвестно';
+                    const coins = (guildDetails.totalCoins || 0).toLocaleString();
+                    const level = guildDetails.level || 0;
+                    const progress = Math.round((guildDetails.levelPercentage || 0) * 100);
+                    
+                    row.innerHTML = `
+                        <td>${startIndex + index + 1}</td>
+                        <td>${tag} ${name}</td>
+                        <td>${leader}</td>
+                        <td>${coins}</td>
+                        <td>${level}</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: ${progress}%; background: #3498db;" 
+                                     aria-valuenow="${progress}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    ${progress}%
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+
+                // Создаем пагинацию
+                createPagination(page, MAX_PAGES, 'coinsPagination', (newPage) => showCoinsList(newPage));
+
+                loading.style.display = 'none';
+                error.style.display = 'none';
+                content.style.display = 'block';
+                pagination.style.display = 'flex';
+            } catch (err) {
+                console.error('Ошибка:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = 'Ошибка загрузки: ' + err.message;
+            }
+        }
+
+        // Инициализация обработчиков событий
+        document.addEventListener('DOMContentLoaded', () => {
+            // Показываем список по уровню при загрузке страницы
+            showLevelList(1);
+            
+            // Обработчики для табов
+            const coinsTab = document.querySelector('[data-bs-target="#coins"]');
+            coinsTab.addEventListener('shown.bs.tab', () => showCoinsList(1));
+        });
+    </script>
+</body>
+</html> 

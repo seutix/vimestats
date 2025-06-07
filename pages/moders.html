@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Модеры | VimeStats</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/responsive.css" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'VimeArtBold';
+            src: url('../assets/fonts/vimeartbold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
         body {
             background: linear-gradient(135deg, #ffffff 0%, #e6f3ff 100%);
             min-height: 100vh;
@@ -201,9 +208,13 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M8 21h8M12 17v4M19 5V3H5v2M19 5v2a7 7 0 0 1-14 0V5m14 0h2a2 2 0 0 1 2 2v1a7 7 0 0 1-6 6.93M5 5H3a2 2 0 0 0-2 2v1a7 7 0 0 0 6 6.93" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     Топы
                 </a>
+                <a href="guilds.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M3 21h18M3 18h18M8 21v-3m8 3v-3m-4 0v-3m0-1V7m3 3V7m3 3V7m-12 3V7m3 3V7M12 7H4.2c-.56 0-.84 0-1.054-.109a1 1 0 0 1-.437-.437C2.6 6.24 2.6 5.96 2.6 5.4V4.2c0-.56 0-.84.109-1.054a1 1 0 0 1 .437-.437C3.36 2.6 3.64 2.6 4.2 2.6h15.6c.56 0 .84 0 1.054.109a1 1 0 0 1 .437.437C20.64 7 20.36 7 19.8 7H12z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Гильдии
+                </a>
                 <a href="moders.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Модеры
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Персонал
                 </a>
             </div>
             <div style="position:absolute;right:80px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;background:#e6f3ff;border-radius:10px;padding:0 12px;height:40px;box-shadow:0 2px 8px rgba(52,152,219,0.08);">
@@ -214,7 +225,7 @@
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </div>
-                 <div class="recent-nicks" id="quickRecentNicks">
+                <div class="recent-nicks" id="quickRecentNicks">
                     <ul class="recent-nicks-list"></ul>
                 </div>
             </div>
@@ -312,7 +323,7 @@
             `;
 
             card.addEventListener('click', () => {
-                window.location.href = `player.html?username=${encodeURIComponent(moderator.username)}`;
+                window.location.href = `/pages/player.html?username=${encodeURIComponent(moderator.username)}`;
             });
 
             return card;
@@ -325,6 +336,9 @@
             
             // Очищаем контейнер
             container.innerHTML = '';
+            
+            // Проверяем, есть ли онлайн модераторы
+
             
             // Сортируем модераторов по рангу и имени
             moderators.sort((a, b) => {
@@ -351,11 +365,132 @@
             });
         }
 
+        // Функция для обновления UI для авторизованного пользователя
+        function updateAuthorizedUI(user) {
+            const authBlock = document.getElementById('auth-key-btn');
+            if (authBlock) {
+                authBlock.innerHTML = `
+                    <div class="auth-info">
+                        <img src="https://skin.vimeworld.com/head/${user.username}.png" alt="${user.username}" class="auth-avatar">
+                        <div class="auth-details">
+                            <div class="auth-name">${user.username}</div>
+                            <div class="auth-id">ID: ${user.id}</div>
+                        </div>
+                        <button class="logout-btn" onclick="logout()">Выйти</button>
+                    </div>
+                `;
+                
+                // Добавляем стили
+                authBlock.style.display = 'flex';
+                authBlock.style.justifyContent = 'center';
+                authBlock.style.alignItems = 'center';
+                authBlock.style.gap = '16px';
+                authBlock.style.padding = '16px';
+                authBlock.style.borderRadius = '8px';
+                authBlock.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                authBlock.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                
+                const authAvatar = authBlock.querySelector('.auth-avatar');
+                if (authAvatar) {
+                    authAvatar.style.width = '48px';
+                    authAvatar.style.height = '48px';
+                    authAvatar.style.borderRadius = '50%';
+                    authAvatar.style.objectFit = 'cover';
+                }
+                
+                const authDetails = authBlock.querySelector('.auth-details');
+                if (authDetails) {
+                    authDetails.style.display = 'flex';
+                    authDetails.style.flexDirection = 'column';
+                    authDetails.style.gap = '4px';
+                }
+                
+                const authName = authBlock.querySelector('.auth-name');
+                if (authName) {
+                    authName.style.fontWeight = 'bold';
+                    authName.style.fontSize = '1rem';
+                }
+                
+                const authId = authBlock.querySelector('.auth-id');
+                if (authId) {
+                    authId.style.fontSize = '0.8rem';
+                    authId.style.color = '#666';
+                }
+                
+                const logoutBtn = authBlock.querySelector('.logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.style.padding = '8px 16px';
+                    logoutBtn.style.border = 'none';
+                    logoutBtn.style.borderRadius = '4px';
+                    logoutBtn.style.backgroundColor = '#e74c3c';
+                    logoutBtn.style.color = 'white';
+                    logoutBtn.style.cursor = 'pointer';
+                    logoutBtn.style.transition = 'background-color 0.2s';
+                    logoutBtn.style.fontFamily = 'VimeArtBold', sans-serif;
+                    
+                    logoutBtn.addEventListener('mouseenter', () => {
+                        logoutBtn.style.backgroundColor = '#c0392b';
+                    });
+                    
+                    logoutBtn.addEventListener('mouseleave', () => {
+                        logoutBtn.style.backgroundColor = '#e74c3c';
+                    });
+                }
+            }
+        }
+
+        // Функция для обновления UI для неавторизованного пользователя
+        function updateUnauthorizedUI() {
+            const authBlock = document.getElementById('auth-key-btn');
+            if (authBlock) {
+                authBlock.innerHTML = `
+                    <button class="auth-btn" onclick="window.location.href='pages/auth.html'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Войти
+                    </button>
+                `;
+                
+                // Добавляем стили
+                authBlock.style.display = 'flex';
+                authBlock.style.justifyContent = 'center';
+                authBlock.style.alignItems = 'center';
+                authBlock.style.gap = '16px';
+                authBlock.style.padding = '16px';
+                authBlock.style.borderRadius = '8px';
+                authBlock.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                authBlock.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                
+                const authBtn = authBlock.querySelector('.auth-btn');
+                if (authBtn) {
+                    authBtn.style.padding = '8px 16px';
+                    authBtn.style.border = 'none';
+                    authBtn.style.borderRadius = '4px';
+                    authBtn.style.backgroundColor = '#3498db';
+                    authBtn.style.color = 'white';
+                    authBtn.style.cursor = 'pointer';
+                    authBtn.style.transition = 'background-color 0.2s';
+                    authBtn.style.fontFamily = 'VimeArtBold', sans-serif;
+                    
+                    authBtn.addEventListener('mouseenter', () => {
+                        authBtn.style.backgroundColor = '#2980b9';
+                    });
+                    
+                    authBtn.addEventListener('mouseleave', () => {
+                        authBtn.style.backgroundColor = '#3498db';
+                    });
+                }
+            }
+        }
+
         // Загружаем модераторов при загрузке страницы
         document.addEventListener('DOMContentLoaded', () => {
             displayModerators();
             // Обновляем список каждые 30 секунд
             setInterval(displayModerators, 30000);
+            // Инициализируем UI авторизации
+            updateAuthUI();
         });
 
         // Функционал поиска и недавних никнеймов
@@ -398,7 +533,7 @@
                     <span>${nick}</span>
                 `;
                 li.addEventListener('click', () => {
-                    window.location.href = `player.html?username=${encodeURIComponent(nick)}`;
+                    window.location.href = `/pages/player.html?username=${encodeURIComponent(nick)}`;
                 });
                 quickRecentNicksList.appendChild(li);
             });
@@ -420,7 +555,7 @@
                 const username = quickSearchInput.value.trim();
                 if (username) {
                     saveQuickNick(username);
-                    window.location.href = `player.html?username=${encodeURIComponent(username)}`;
+                    window.location.href = `/pages/player.html?username=${encodeURIComponent(username)}`;
                 }
             }
         });
@@ -429,12 +564,8 @@
             const username = quickSearchInput.value.trim();
             if (username) {
                 saveQuickNick(username);
-                window.location.href = `player.html?username=${encodeURIComponent(username)}`;
+                window.location.href = `/pages/player.html?username=${encodeURIComponent(username)}`;
             }
-        });
-
-        document.getElementById('auth-key-btn').addEventListener('click', () => {
-            window.location.href = 'auth.html';
         });
 
         // Загружаем недавние никнеймы при загрузке страницы

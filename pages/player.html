@@ -978,6 +978,85 @@
             box-shadow: 0 0 3px #e74c3c;
             animation: none;
         }
+
+        .achievement-stats {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .achievement-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .achievement-card.completed {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .achievement-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .completion-status {
+            margin-right: 10px;
+            font-size: 1.2em;
+            color: #ff5555;
+        }
+
+        .completion-status.completed {
+            color: #4CAF50;
+        }
+
+        .achievement-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .achievement-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .achievement-reward {
+            color: #ff9800;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .error-message button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .error-message button:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 <body>
@@ -986,7 +1065,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="position:fixed;top:0;left:0;width:100%;z-index:1000;">
         <div class="container-fluid" style="padding-left:0;padding-right:0;position:relative;min-height:56px;display:flex;align-items:center;">
-            <a class="navbar-brand" href="index.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.2rem;color:#3498db;letter-spacing:1px;padding-left:24px;z-index:2;">VimeStats</a>
+            <a class="navbar-brand" href="../index.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.2rem;color:#3498db;letter-spacing:1px;padding-left:24px;z-index:2;">VimeStats</a>
             <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:24px;z-index:1;">
                 <a href="tops.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M8 21h8M12 17v4M19 5V3H5v2M19 5v2a7 7 0 0 1-14 0V5m14 0h2a2 2 0 0 1 2 2v1a7 7 0 0 1-6 6.93M5 5H3a2 2 0 0 0-2 2v1a7 7 0 0 0 6 6.93" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -994,7 +1073,7 @@
                 </a>
                 <a href="moders.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Модеры
+                    Персонал
                 </a>
             </div>
             <div style="position:absolute;right:80px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;background:#e6f3ff;border-radius:10px;padding:0 12px;height:40px;box-shadow:0 2px 8px rgba(52,152,219,0.08);">
@@ -3907,6 +3986,175 @@ function downloadFile(url, fileName) {
             alert('Не удалось скачать файл. Попробуйте позже.');
         });
 }
+
+    async function loadAchievements(username) {
+        try {
+            const response = await fetch(`https://api.vimeworld.com/user/${username}/achievements`);
+            if (!response.ok) {
+                throw new Error('Failed to load achievements');
+            }
+            const achievements = await response.json();
+            
+            // Sort achievements - incomplete first
+            achievements.sort((a, b) => {
+                if (a.time === 0 && b.time !== 0) return -1;
+                if (a.time !== 0 && b.time === 0) return 1;
+                return 0;
+            });
+
+            const achievementsContainer = document.getElementById('achievements-container');
+            achievementsContainer.innerHTML = ''; // Clear existing achievements
+
+            // Add achievement stats
+            const totalAchievements = achievements.length;
+            const completedAchievements = achievements.filter(a => a.time !== 0).length;
+            const completionPercentage = ((completedAchievements / totalAchievements) * 100).toFixed(1);
+
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'achievement-stats';
+            statsDiv.innerHTML = `
+                <div class="stats-box">
+                    <h3>Статистика достижений</h3>
+                    <p>Выполнено: ${completedAchievements} из ${totalAchievements} (${completionPercentage}%)</p>
+                </div>
+            `;
+            achievementsContainer.appendChild(statsDiv);
+
+            // Create achievement cards
+            achievements.forEach(achievement => {
+                const card = document.createElement('div');
+                card.className = 'achievement-card';
+                if (achievement.time !== 0) {
+                    card.classList.add('completed');
+                }
+
+                const completionStatus = achievement.time !== 0 ? '✓' : '×';
+                const completionDate = achievement.time !== 0 
+                    ? new Date(achievement.time).toLocaleDateString('ru-RU') 
+                    : 'Не выполнено';
+
+                card.innerHTML = `
+                    <div class="achievement-header">
+                        <span class="completion-status ${achievement.time !== 0 ? 'completed' : ''}">${completionStatus}</span>
+                        <h3>${achievement.title}</h3>
+                    </div>
+                    <p class="achievement-description">${achievement.description}</p>
+                    <div class="achievement-footer">
+                        <span class="achievement-reward">Награда: ${achievement.reward}</span>
+                        <span class="achievement-date">${completionDate}</span>
+                    </div>
+                `;
+
+                achievementsContainer.appendChild(card);
+            });
+        } catch (error) {
+            console.error('Error loading achievements:', error);
+            const achievementsContainer = document.getElementById('achievements-container');
+            achievementsContainer.innerHTML = `
+                <div class="error-message">
+                    <p>Ошибка при загрузке достижений. Пожалуйста, попробуйте позже.</p>
+                    <button onclick="loadAchievements('${username}')">Попробовать снова</button>
+                </div>
+            `;
+        }
+    }
+
+    // Add this to your existing loadPlayerData function
+    async function loadPlayerData(username) {
+        try {
+            // ... existing player data loading code ...
+
+            // Load achievements
+            await loadAchievements(username);
+
+        } catch (error) {
+            console.error('Error:', error);
+            // ... existing error handling ...
+        }
+    }
+
+    // ... existing code ...
+    async function loadPlayerData(username) {
+        try {
+            const response = await fetch(`https://api.vimeworld.com/user/name/${username}`);
+            if (!response.ok) {
+                throw new Error('Игрок не найден');
+            }
+            const [playerData] = await response.json();
+            if (!playerData) {
+                throw new Error('Игрок не найден');
+            }
+
+            // Update page title
+            document.title = `${playerData.username} | VimeStats`;
+
+            // Update player info
+            updatePlayerInfo(playerData);
+            
+            // Load stats
+            await loadStats(playerData.id);
+            
+            // Load achievements
+            await loadAchievements(username);
+            
+            // Load friends
+            await loadFriends(playerData.id);
+            
+            // Load matches if needed
+            if (currentTab === 'matches') {
+                await loadMatches(playerData.id);
+            }
+            
+            // Show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    ${error.message}
+                    <button type="button" class="btn btn-danger mt-2" onclick="window.location.href='../index.html'">На главную</button>
+                </div>
+            `;
+        }
+    }
+
+    // Add achievements tab to the navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabList = document.querySelector('.nav-tabs');
+        if (tabList) {
+            const achievementsTab = document.createElement('li');
+            achievementsTab.className = 'nav-item';
+            achievementsTab.innerHTML = `
+                <a class="nav-link" id="achievements-tab" data-bs-toggle="tab" href="#achievements" role="tab">
+                    Достижения
+                </a>
+            `;
+            tabList.appendChild(achievementsTab);
+        }
+
+        // Add achievements container to the tab content
+        const tabContent = document.querySelector('.tab-content');
+        if (tabContent) {
+            const achievementsPane = document.createElement('div');
+            achievementsPane.className = 'tab-pane fade';
+            achievementsPane.id = 'achievements';
+            achievementsPane.setAttribute('role', 'tabpanel');
+            achievementsPane.innerHTML = `
+                <div id="achievements-container" class="mt-4">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Загрузка...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            tabContent.appendChild(achievementsPane);
+        }
+    });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/skinview3d@latest/bundles/skinview3d.bundle.js"></script>

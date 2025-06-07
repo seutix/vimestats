@@ -273,7 +273,7 @@
                 </a>
                 <a href="moders.html" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Модеры
+                    Персонал
                 </a>
                 <a id="my-profile-link" href="#" style="font-family:'VimeArtBold',sans-serif;font-size:1.1rem;color:#3498db;text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:6px;display:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;display:inline-block;margin-bottom:-3px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -435,7 +435,7 @@
                             
                             // Перенаправляем на страницу игрока
                             setTimeout(() => {
-                                window.location.href = `player.html?username=${encodeURIComponent(originalUsername)}`;
+                                window.location.href = `pages/player.html?username=${encodeURIComponent(originalUsername)}`;
                             }, 1000);
                         } else {
                             alert('Игрок с таким ID не найден');
@@ -464,7 +464,7 @@
                             
                             // Перенаправляем на страницу с оригинальным никнеймом
                             setTimeout(() => {
-                                window.location.href = `player.html?username=${encodeURIComponent(originalUsername)}`;
+                                window.location.href = `pages/player.html?username=${encodeURIComponent(originalUsername)}`;
                             }, 1000);
                         } else {
                             // Если игрок не найден
@@ -858,7 +858,7 @@
             // Обновляем видимость и ссылку кнопки "Мой профиль"
             if (authStatus.isAuthorized && authStatus.userData) {
                 myProfileLink.style.display = 'flex';
-                myProfileLink.href = `player.html?username=${encodeURIComponent(authStatus.userData.username)}`;
+                myProfileLink.href = `pages/player.html?username=${encodeURIComponent(authStatus.userData.username)}`;
             } else {
                 myProfileLink.style.display = 'none';
             }
@@ -989,7 +989,7 @@
                     };
                     
                     profileBtn.onclick = function() {
-                        window.location.href = `player.html?username=${encodeURIComponent(userData.username)}`;
+                        window.location.href = `pages/player.html?username=${encodeURIComponent(userData.username)}`;
                     };
                     
                     authMenu.appendChild(profileBtn);
@@ -1040,7 +1040,7 @@
                 
                 // Устанавливаем обработчик клика для перехода на страницу авторизации
                 authKeyBtn.onclick = function() {
-                    window.location.href = 'auth.html';
+                    window.location.href = 'pages/auth.html';
                 };
             }
         }
@@ -1075,7 +1075,7 @@
                 
                 // Перенаправляем на страницу игрока
                 setTimeout(() => {
-                    window.location.href = `player.html?username=${encodeURIComponent(userData.username)}`;
+                    window.location.href = `pages/player.html?username=${encodeURIComponent(userData.username)}`;
                 }, 1000);
             } else {
                 alert('Ошибка авторизации. Проверьте правильность API-ключа.');
@@ -1100,7 +1100,7 @@
             // перенаправляем на страницу игрока
             const authStatus = checkAuth();
             if (authStatus.isAuthorized && window.location.pathname.includes('auth.html')) {
-                window.location.href = `player.html?username=${encodeURIComponent(authStatus.userData.username)}`;
+                window.location.href = `pages/player.html?username=${encodeURIComponent(authStatus.userData.username)}`;
             }
         });
 
@@ -1109,7 +1109,7 @@
             const authStatus = checkAuth();
             if (authStatus.isAuthorized) {
                 // Перенаправляем на страницу игрока
-                window.location.href = `player.html?username=${encodeURIComponent(authStatus.userData.username)}`;
+                window.location.href = `pages/player.html?username=${encodeURIComponent(authStatus.userData.username)}`;
             } else {
                 // Если не авторизован, переходим на страницу авторизации
                 window.location.href = 'auth.html';
